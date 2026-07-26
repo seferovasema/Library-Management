@@ -5,6 +5,7 @@ A RESTful Library Management System built with **Spring Boot** that allows manag
 ## 🚀 Features
 
 * User Registration & Login
+* User Authentication & Authorization
 * JWT Authentication
 * Role-Based Authorization (ADMIN, USER)
 * BCrypt Password Encryption
@@ -14,6 +15,7 @@ A RESTful Library Management System built with **Spring Boot** that allows manag
 * DTO Pattern
 * MapStruct Mapping
 * Bean Validation
+* Request Validation
 * Global Exception Handling
 * Custom Authentication Entry Point
 * Custom Access Denied Handler
@@ -43,7 +45,7 @@ A RESTful Library Management System built with **Spring Boot** that allows manag
 
 ## 📂 Project Structure
 
-```
+```text
 src
 ├── config
 ├── controller
@@ -69,16 +71,16 @@ The application uses JWT-based authentication.
 
 ### Public Endpoints
 
-```
+```http
 POST /auth/register
 POST /auth/login
 ```
 
-After a successful login, a JWT token is returned.
+After a successful login, the application returns a JWT token.
 
-Include the token in every protected request:
+Protected endpoints require a valid JWT token in the `Authorization` header:
 
-```
+```http
 Authorization: Bearer <your_jwt_token>
 ```
 
@@ -86,9 +88,16 @@ Authorization: Bearer <your_jwt_token>
 
 ## 📖 API Endpoints
 
+### Authentication
+
+```http
+POST /auth/register
+POST /auth/login
+```
+
 ### Authors
 
-```
+```http
 GET    /authors
 GET    /authors/{id}
 POST   /authors
@@ -98,7 +107,7 @@ DELETE /authors/{id}
 
 ### Books
 
-```
+```http
 GET    /books
 GET    /books/{id}
 POST   /books
@@ -108,7 +117,7 @@ DELETE /books/{id}
 
 ### Members
 
-```
+```http
 GET    /members
 GET    /members/{id}
 POST   /members
@@ -120,9 +129,9 @@ DELETE /members/{id}
 
 ## 📑 API Documentation
 
-Swagger UI is available after running the application:
+Swagger UI is available after starting the application:
 
-```
+```text
 http://localhost:8080/swagger-ui/index.html
 ```
 
@@ -130,9 +139,9 @@ http://localhost:8080/swagger-ui/index.html
 
 ## 🗄 Database
 
-Database: **PostgreSQL**
+**Database:** PostgreSQL
 
-The application uses Spring Data JPA with Hibernate for database operations.
+The application uses Spring Data JPA and Hibernate for database operations.
 
 ---
 
@@ -152,11 +161,19 @@ cd Library-Management
 
 Run the application:
 
+**Linux / macOS**
+
 ```bash
 ./gradlew bootRun
 ```
 
-or run it directly from IntelliJ IDEA.
+**Windows**
+
+```bash
+gradlew.bat bootRun
+```
+
+You can also run the project directly from IntelliJ IDEA.
 
 ---
 
@@ -164,5 +181,4 @@ or run it directly from IntelliJ IDEA.
 
 **Sema Seferova**
 
-GitHub:
-https://github.com/seferovasema/Library-Management
+GitHub Repository: https://github.com/seferovasema/Library-Management
