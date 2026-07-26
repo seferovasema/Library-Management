@@ -1,37 +1,34 @@
 package com.sema.librarymanagment.entity;
 
+import com.sema.librarymanagment.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.util.List;
-
-
 @Entity
-@Table(name = "authors")
+@Table(name = "users")
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @EqualsAndHashCode(of = "id")
-public class Author {
-
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    @Column(nullable = false)
-    String name;
+    @Column(nullable = false, unique = true)
+    String username;
 
     @Column(nullable = false, unique = true)
     String email;
 
-    @OneToMany(mappedBy = "author", fetch = FetchType.LAZY)
-    List<Book> books;
+    @Column(nullable = false)
+    String password;
 
-    public Author(Long id, String name, String email) {
-        this.id = id;
-        this.name = name;
-        this.email = email;
-    }
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    Role role = Role.USER;
+
 }

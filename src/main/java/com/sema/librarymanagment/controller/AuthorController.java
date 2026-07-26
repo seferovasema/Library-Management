@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -32,6 +33,7 @@ public class AuthorController {
             @ApiResponse(responseCode = "201", description = "Author created successfully"),
             @ApiResponse(responseCode = "400", description = "Validation failed")
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<AuthorResponseDto> create(@Valid @RequestBody AuthorRequestDto dto) {
 
@@ -44,6 +46,7 @@ public class AuthorController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Authors retrieved successfully")
     })
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @GetMapping
     public ResponseEntity<PageResponseDto<AuthorResponseDto>> getAll(
             @PageableDefault(size = 10, sort = "id") Pageable pageable) {
@@ -56,6 +59,7 @@ public class AuthorController {
             @ApiResponse(responseCode = "200", description = "Author found"),
             @ApiResponse(responseCode = "404", description = "Author not found")
     })
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<AuthorResponseDto> findById(@PathVariable Long id) {
 
@@ -68,6 +72,7 @@ public class AuthorController {
             @ApiResponse(responseCode = "400", description = "Validation failed"),
             @ApiResponse(responseCode = "404", description = "Author not found")
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<AuthorResponseDto> update(@PathVariable Long id,
                                                     @Valid @RequestBody AuthorRequestDto dto) {
@@ -80,6 +85,7 @@ public class AuthorController {
             @ApiResponse(responseCode = "204", description = "Author deleted successfully"),
             @ApiResponse(responseCode = "404", description = "Author not found")
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
 

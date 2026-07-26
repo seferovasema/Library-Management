@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,6 +35,7 @@ public class BookController {
             @ApiResponse(responseCode = "400", description = "Validation failed"),
             @ApiResponse(responseCode = "404", description = "Author or Member not found")
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<BookResponseDto> create(@Valid @RequestBody BookRequestDto dto) {
 
@@ -42,10 +44,12 @@ public class BookController {
                 .body(bookService.create(dto));
     }
 
+
     @Operation(summary = "Get all books")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Books retrieved successfully")
     })
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @GetMapping
     public ResponseEntity<PageResponseDto<BookResponseDto>> getAllBooks(
             @PageableDefault(size = 10, sort = "id") Pageable pageable) {
@@ -53,35 +57,42 @@ public class BookController {
         return ResponseEntity.ok(bookService.getAll(pageable));
     }
 
+
     @Operation(summary = "Get book by id")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Book found"),
             @ApiResponse(responseCode = "404", description = "Book not found")
     })
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<BookResponseDto> findById(@PathVariable Long id) {
 
         return ResponseEntity.ok(bookService.findById(id));
     }
 
+
     @Operation(summary = "Get books by author")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Books retrieved successfully")
     })
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @GetMapping("/author/{authorId}")
     public ResponseEntity<List<BookResponseDto>> getBooksByAuthor(@PathVariable Long authorId) {
 
         return ResponseEntity.ok(bookService.getBooksByAuthor(authorId));
     }
 
+
     @Operation(summary = "Get books by member")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Books retrieved successfully")
     })
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @GetMapping("/member/{memberId}")
     public ResponseEntity<List<BookResponseDto>> getBooksByMember(@PathVariable Long memberId) {
         return ResponseEntity.ok(bookService.getBooksByMember(memberId));
     }
+
 
     @Operation(summary = "Update book")
     @ApiResponses({
@@ -89,6 +100,7 @@ public class BookController {
             @ApiResponse(responseCode = "400", description = "Validation failed"),
             @ApiResponse(responseCode = "404", description = "Book, Author or Member not found")
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<BookResponseDto> update(@PathVariable Long id,
                                                   @Valid @RequestBody BookRequestDto dto) {
@@ -96,11 +108,13 @@ public class BookController {
         return ResponseEntity.ok(bookService.update(id, dto));
     }
 
+
     @Operation(summary = "Delete book")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Book deleted successfully"),
             @ApiResponse(responseCode = "404", description = "Book not found")
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
 

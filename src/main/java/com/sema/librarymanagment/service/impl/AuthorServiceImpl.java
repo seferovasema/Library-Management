@@ -52,7 +52,9 @@ public class AuthorServiceImpl implements AuthorService {
                 new ResourceNotFoundException("Author not found"));
         author.setName(dto.getName());
         author.setEmail(dto.getEmail());
-        return authorMapper.toDto(author);
+
+        Author updatedAuthor = authorRepository.save(author);
+        return authorMapper.toDto(updatedAuthor);
     }
 
     @Override
