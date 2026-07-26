@@ -1,79 +1,168 @@
-# Library Management System
+# 📚 Library Management System
 
-A RESTful Library Management System developed with Spring Boot.
+A RESTful Library Management System built with **Spring Boot** that allows managing books, authors, members, and users. The project follows a layered architecture and includes authentication and authorization using **Spring Security** and **JWT**.
 
-## Features
+## 🚀 Features
 
-- Author, Book and Member management
-- CRUD operations
-- Layered Architecture (Controller → Service → Repository)
-- DTO and MapStruct
-- Bean Validation
-- Global Exception Handling
-- Pagination and Sorting
-- Swagger / OpenAPI Documentation
-- Unit Testing with JUnit 5 and Mockito
+* User Registration & Login
+* JWT Authentication
+* Role-Based Authorization (ADMIN, USER)
+* BCrypt Password Encryption
+* CRUD operations for Books
+* CRUD operations for Authors
+* CRUD operations for Members
+* DTO Pattern
+* MapStruct Mapping
+* Bean Validation
+* Global Exception Handling
+* Custom Authentication Entry Point
+* Custom Access Denied Handler
+* Pagination & Sorting
+* Swagger/OpenAPI Documentation
+* PostgreSQL Database
+* Layered Architecture (Controller → Service → Repository)
 
-## Technologies
+---
 
-- Java 17
-- Spring Boot
-- Spring Data JPA
-- PostgreSQL
-- Gradle
-- Lombok
-- MapStruct
-- Swagger (OpenAPI)
-- JUnit 5
-- Mockito
+## 🛠 Technologies
 
-## Project Structure
+* Java 21
+* Spring Boot
+* Spring Security
+* JWT (JSON Web Token)
+* Spring Data JPA
+* PostgreSQL
+* Hibernate
+* Lombok
+* MapStruct
+* Bean Validation
+* Swagger/OpenAPI
+* Gradle
+
+---
+
+## 📂 Project Structure
 
 ```
-Controller
-    ↓
-Service
-    ↓
-Repository
+src
+├── config
+├── controller
+├── dto
+│   ├── request
+│   └── response
+├── entity
+├── enums
+├── exception
+├── mapper
+├── repository
+├── security
+├── service
+│   └── impl
+└── resources
 ```
 
-## API Endpoints
+---
+
+## 🔐 Authentication
+
+The application uses JWT-based authentication.
+
+### Public Endpoints
+
+```
+POST /auth/register
+POST /auth/login
+```
+
+After a successful login, a JWT token is returned.
+
+Include the token in every protected request:
+
+```
+Authorization: Bearer <your_jwt_token>
+```
+
+---
+
+## 📖 API Endpoints
 
 ### Authors
-- POST /authors
-- GET /authors
-- GET /authors/{id}
-- PUT /authors/{id}
-- DELETE /authors/{id}
+
+```
+GET    /authors
+GET    /authors/{id}
+POST   /authors
+PUT    /authors/{id}
+DELETE /authors/{id}
+```
 
 ### Books
-- POST /books
-- GET /books
-- GET /books/{id}
-- PUT /books/{id}
-- DELETE /books/{id}
+
+```
+GET    /books
+GET    /books/{id}
+POST   /books
+PUT    /books/{id}
+DELETE /books/{id}
+```
 
 ### Members
-- POST /members
-- GET /members
-- GET /members/{id}
-- PUT /members/{id}
-- DELETE /members/{id}
 
-## Project Status
+```
+GET    /members
+GET    /members/{id}
+POST   /members
+PUT    /members/{id}
+DELETE /members/{id}
+```
 
-✅ Week 1 Completed
+---
 
-Implemented:
-- Layered Architecture
-- CRUD APIs
-- DTO Mapping
-- Validation
-- Exception Handling
-- Pagination & Sorting
-- Swagger Documentation
-- Unit Tests
+## 📑 API Documentation
 
-## Author
+Swagger UI is available after running the application:
+
+```
+http://localhost:8080/swagger-ui/index.html
+```
+
+---
+
+## 🗄 Database
+
+Database: **PostgreSQL**
+
+The application uses Spring Data JPA with Hibernate for database operations.
+
+---
+
+## ▶ Running the Project
+
+Clone the repository:
+
+```bash
+git clone https://github.com/seferovasema/Library-Management.git
+```
+
+Go to the project directory:
+
+```bash
+cd Library-Management
+```
+
+Run the application:
+
+```bash
+./gradlew bootRun
+```
+
+or run it directly from IntelliJ IDEA.
+
+---
+
+## 👩‍💻 Author
 
 **Sema Seferova**
+
+GitHub:
+https://github.com/seferovasema/Library-Management
