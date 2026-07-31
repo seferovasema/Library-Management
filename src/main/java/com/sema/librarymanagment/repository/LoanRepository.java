@@ -19,4 +19,6 @@ public interface LoanRepository extends JpaRepository<Loan, Long> {
     List<Loan> findByBookTitleContainingIgnoreCase(String titleKeyword);
 
     Optional<Loan> findByBookIdAndReturnedFalse(Long bookId);
+
+    boolean existsByBookIdAndReturnedFalse(Long bookId);
 }
