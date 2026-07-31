@@ -31,6 +31,9 @@ public class Member {
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
     List<Book> books;
 
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
+    List<Loan> loans;
+
     public Member(Long id, String fullName, String email, String phone) {
         this.id = id;
         this.fullName = fullName;
