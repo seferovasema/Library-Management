@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface LoanRepository extends JpaRepository<Loan, Long> {
@@ -16,4 +17,6 @@ public interface LoanRepository extends JpaRepository<Loan, Long> {
     List<Loan> findByMemberIdAndReturnedFalse(Long memberId);
 
     List<Loan> findByBookTitleContainingIgnoreCase(String titleKeyword);
+
+    Optional<Loan> findByBookIdAndReturnedFalse(Long bookId);
 }
