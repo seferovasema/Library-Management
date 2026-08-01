@@ -21,5 +21,4 @@ public class BookResponseDto {
 
     String authorName;
 
-    String memberName;
 }

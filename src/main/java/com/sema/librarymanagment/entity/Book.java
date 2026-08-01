@@ -32,9 +32,6 @@ public class Book {
     @JoinColumn(name = "author_id")
     Author author;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    Member member;
 
     @ManyToMany
     @JoinTable(

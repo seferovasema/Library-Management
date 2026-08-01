@@ -16,8 +16,6 @@ public interface BookService {
 
     List<BookResponseDto> getBooksByAuthor(Long authorId);
 
-    List<BookResponseDto> getBooksByMember(Long memberId);
-
     BookResponseDto update(Long id, BookRequestDto dto);
 
     void delete(Long id);

@@ -31,7 +31,4 @@ public class BookRequestDto {
     @NotNull(message = "Author id cannot be null")
     Long authorId;
 
-    @Schema(description = "Member ID", example = "2")
-    @NotNull(message = "Member id cannot be null")
-    Long memberId;
 }

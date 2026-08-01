@@ -83,17 +83,6 @@ public class BookController {
     }
 
 
-    @Operation(summary = "Get books by member")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Books retrieved successfully")
-    })
-    @PreAuthorize("hasAnyRole('USER','ADMIN')")
-    @GetMapping("/member/{memberId}")
-    public ResponseEntity<List<BookResponseDto>> getBooksByMember(@PathVariable Long memberId) {
-        return ResponseEntity.ok(bookService.getBooksByMember(memberId));
-    }
-
-
     @Operation(summary = "Update book")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Book updated successfully"),

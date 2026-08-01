@@ -5,7 +5,6 @@ import com.sema.librarymanagment.dto.response.BookResponseDto;
 import com.sema.librarymanagment.dto.response.PageResponseDto;
 import com.sema.librarymanagment.entity.Author;
 import com.sema.librarymanagment.entity.Book;
-import com.sema.librarymanagment.entity.Member;
 import com.sema.librarymanagment.exception.ResourceNotFoundException;
 import com.sema.librarymanagment.mapper.BookMapper;
 import com.sema.librarymanagment.repository.AuthorRepository;
@@ -25,7 +24,6 @@ public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
     private final BookMapper bookMapper;
     private final AuthorRepository authorRepository;
-    private final MemberRepository memberRepository;
 
     @Override
     public BookResponseDto create(BookRequestDto dto) {
@@ -34,13 +32,8 @@ public class BookServiceImpl implements BookService {
                 .findById(dto.getAuthorId())
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Author not found"));
-        Member member = memberRepository
-                .findById(dto.getMemberId())
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Member not found"));
 
         book.setAuthor(author);
-        book.setMember(member);
 
         Book bookSaved = bookRepository.save(book);
         return bookMapper.toDto(bookSaved);
@@ -71,14 +64,7 @@ public class BookServiceImpl implements BookService {
                 .toList();
     }
 
-    @Override
-    public List<BookResponseDto> getBooksByMember(Long memberId) {
-        List<Book> books = bookRepository.findByMemberId(memberId);
-        return books
-                .stream()
-                .map(bookMapper::toDto)
-                .toList();
-    }
+
 
     @Override
     public BookResponseDto update(Long id, BookRequestDto dto) {
@@ -89,14 +75,10 @@ public class BookServiceImpl implements BookService {
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Author not found"));
 
-        Member member = memberRepository.findById(dto.getMemberId())
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Member not found"));
 
         book.setTitle(dto.getTitle());
         book.setPrice(dto.getPrice());
         book.setAuthor(author);
-        book.setMember(member);
         Book updatedBook = bookRepository.save(book);
         return bookMapper.toDto(updatedBook);
     }

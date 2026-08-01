@@ -20,6 +20,4 @@ public class MemberResponseDto {
     String email;
 
     String phone;
-
-    List<BookResponseDto> books;
 }
