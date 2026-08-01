@@ -43,4 +43,13 @@ public class LoanServiceImpl implements LoanService {
                 .map(loanMapper::toDto)
                 .toList();
     }
+
+    @Override
+    public List<LoanResponseDto> searchLoansByBookTitle(String title) {
+        List<Loan> loans = loanRepository.findByBookTitleContainingIgnoreCase(title);
+
+        return loans.stream()
+                .map(loanMapper::toDto)
+                .toList();
+    }
 }
