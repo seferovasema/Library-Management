@@ -5,10 +5,12 @@ import com.sema.librarymanagment.dto.response.BookResponseDto;
 import com.sema.librarymanagment.dto.response.PageResponseDto;
 import com.sema.librarymanagment.entity.Author;
 import com.sema.librarymanagment.entity.Book;
+import com.sema.librarymanagment.entity.Category;
 import com.sema.librarymanagment.exception.ResourceNotFoundException;
 import com.sema.librarymanagment.mapper.BookMapper;
 import com.sema.librarymanagment.repository.AuthorRepository;
 import com.sema.librarymanagment.repository.BookRepository;
+import com.sema.librarymanagment.repository.CategoryRepository;
 import com.sema.librarymanagment.service.BookService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -23,6 +25,7 @@ public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
     private final BookMapper bookMapper;
     private final AuthorRepository authorRepository;
+    private final CategoryRepository categoryRepository;
 
     @Override
     public BookResponseDto create(BookRequestDto dto) {
@@ -33,6 +36,10 @@ public class BookServiceImpl implements BookService {
                         new ResourceNotFoundException("Author not found"));
 
         book.setAuthor(author);
+
+        List<Category> categories = categoryRepository.findAllById(dto.getCategoryIds());
+
+        book.setCategories(categories);
 
         Book bookSaved = bookRepository.save(book);
         return bookMapper.toDto(bookSaved);
@@ -74,6 +81,9 @@ public class BookServiceImpl implements BookService {
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Author not found"));
 
+        List<Category> categories = categoryRepository.findAllById(dto.getCategoryIds());
+
+        book.setCategories(categories);
 
         book.setTitle(dto.getTitle());
         book.setPrice(dto.getPrice());
