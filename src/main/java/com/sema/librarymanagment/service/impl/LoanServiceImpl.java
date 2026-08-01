@@ -85,6 +85,12 @@ public class LoanServiceImpl implements LoanService {
         loan.setDueDate(dto.getDueDate());
         loan.setReturned(false);
 
+        member.setBorrowedBooksCount(
+                Math.max(0, member.getBorrowedBooksCount() - 1)
+        );
+
+        memberRepository.save(member);
+
         Loan savedLoan = loanRepository.save(loan);
 
         return loanMapper.toDto(savedLoan);
