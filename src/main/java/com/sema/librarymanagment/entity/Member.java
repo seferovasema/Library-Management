@@ -28,6 +28,8 @@ public class Member {
     @Column(nullable = false, unique = true)
     String phone;
 
+    @Column(nullable = false)
+    Integer borrowedBooksCount = 0;
 
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
     List<Loan> loans;
