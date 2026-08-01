@@ -85,9 +85,7 @@ public class LoanServiceImpl implements LoanService {
         loan.setDueDate(dto.getDueDate());
         loan.setReturned(false);
 
-        member.setBorrowedBooksCount(
-                Math.max(0, member.getBorrowedBooksCount() - 1)
-        );
+        member.setBorrowedBooksCount(member.getBorrowedBooksCount() + 1);
 
         memberRepository.save(member);
 
@@ -110,6 +108,12 @@ public class LoanServiceImpl implements LoanService {
 
         loan.setReturned(true);
         loan.setReturnDate(LocalDate.now());
+
+        Member member = loan.getMember();
+        member.setBorrowedBooksCount(
+                Math.max(0, member.getBorrowedBooksCount() - 1)
+        );
+        memberRepository.save(member);
 
         Loan updatedLoan = loanRepository.save(loan);
 
