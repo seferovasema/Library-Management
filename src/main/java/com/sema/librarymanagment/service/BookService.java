@@ -19,6 +19,13 @@ public interface BookService {
     BookResponseDto update(Long id, BookRequestDto dto);
 
     void delete(Long id);
+
+    PageResponseDto<BookResponseDto> searchBooks(
+            String title,
+            String authorName,
+            String category,
+            Pageable pageable
+    );
 }
 
 

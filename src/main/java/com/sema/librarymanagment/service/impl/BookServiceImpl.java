@@ -12,9 +12,11 @@ import com.sema.librarymanagment.repository.AuthorRepository;
 import com.sema.librarymanagment.repository.BookRepository;
 import com.sema.librarymanagment.repository.CategoryRepository;
 import com.sema.librarymanagment.service.BookService;
+import com.sema.librarymanagment.specification.BookSpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -99,5 +101,17 @@ public class BookServiceImpl implements BookService {
                         new ResourceNotFoundException("Book not found"));
 
         bookRepository.delete(book);
+    }
+
+    @Override
+    public PageResponseDto<BookResponseDto> searchBooks(String title, String authorName, String category, Pageable pageable) {
+        Specification<Book> specification =
+                BookSpecification.filterBooks(title, authorName, category);
+
+        Page<Book> books = bookRepository.findAll(specification, pageable);
+
+        Page<BookResponseDto> dtoPage = books.map(bookMapper::toDto);
+
+        return PageResponseDto.of(dtoPage);
     }
 }
