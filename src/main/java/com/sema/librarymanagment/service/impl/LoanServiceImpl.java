@@ -1,10 +1,17 @@
 package com.sema.librarymanagment.service.impl;
 
+import com.sema.librarymanagment.dto.request.LoanRequestDto;
 import com.sema.librarymanagment.dto.response.LoanResponseDto;
+import com.sema.librarymanagment.entity.Book;
 import com.sema.librarymanagment.entity.Loan;
+import com.sema.librarymanagment.entity.Member;
+import com.sema.librarymanagment.exception.ResourceNotFoundException;
 import com.sema.librarymanagment.mapper.LoanMapper;
+import com.sema.librarymanagment.repository.BookRepository;
 import com.sema.librarymanagment.repository.LoanRepository;
+import com.sema.librarymanagment.repository.MemberRepository;
 import com.sema.librarymanagment.service.LoanService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,10 +24,12 @@ public class LoanServiceImpl implements LoanService {
 
     private final LoanRepository loanRepository;
     private final LoanMapper loanMapper;
+    private final BookRepository bookRepository;
+    private final MemberRepository memberRepository;
 
     @Override
     public List<LoanResponseDto> getActiveLoans() {
-        List<Loan> loans=loanRepository.findByReturnedFalse();
+        List<Loan> loans = loanRepository.findByReturnedFalse();
         return loans.stream()
                 .map(loanMapper::toDto)
                 .toList();
@@ -51,5 +60,53 @@ public class LoanServiceImpl implements LoanService {
         return loans.stream()
                 .map(loanMapper::toDto)
                 .toList();
+    }
+
+    @Override
+    @Transactional
+    public LoanResponseDto borrowBook(LoanRequestDto dto) {
+        if (loanRepository.existsByBookIdAndReturnedFalse(dto.getBookId())) {
+            throw new IllegalStateException("Book is already borrowed");
+        }
+
+        Book book = bookRepository.findById(dto.getBookId())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Book not found"));
+
+        Member member = memberRepository.findById(dto.getMemberId())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Member not found"));
+
+        Loan loan = new Loan();
+
+        loan.setBook(book);
+        loan.setMember(member);
+        loan.setBorrowDate(LocalDate.now());
+        loan.setDueDate(dto.getDueDate());
+        loan.setReturned(false);
+
+        Loan savedLoan = loanRepository.save(loan);
+
+        return loanMapper.toDto(savedLoan);
+    }
+
+    @Override
+    @Transactional
+    public LoanResponseDto returnBook(Long loanId) {
+
+        Loan loan = loanRepository.findById(loanId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Loan not found"));
+
+        if (loan.isReturned()) {
+            throw new IllegalStateException("Book has already been returned");
+        }
+
+        loan.setReturned(true);
+        loan.setReturnDate(LocalDate.now());
+
+        Loan updatedLoan = loanRepository.save(loan);
+
+        return loanMapper.toDto(updatedLoan);
     }
 }
