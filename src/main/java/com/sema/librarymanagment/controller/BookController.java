@@ -111,4 +111,31 @@ public class BookController {
 
         return ResponseEntity.noContent().build();
     }
+
+
+    @Operation(summary = "Search books")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Books retrieved successfully")
+    })
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    @GetMapping("/search")
+    public ResponseEntity<PageResponseDto<BookResponseDto>> searchBooks(
+
+            @RequestParam(required = false) String title,
+
+            @RequestParam(required = false) String authorName,
+
+            @RequestParam(required = false) String category,
+
+            @PageableDefault(size = 10, sort = "id") Pageable pageable) {
+
+        return ResponseEntity.ok(
+                bookService.searchBooks(
+                        title,
+                        authorName,
+                        category,
+                        pageable
+                )
+        );
+    }
 }
