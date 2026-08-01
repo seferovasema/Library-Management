@@ -2,6 +2,8 @@ package com.sema.librarymanagment.repository;
 
 import com.sema.librarymanagment.entity.Loan;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -21,4 +23,12 @@ public interface LoanRepository extends JpaRepository<Loan, Long> {
     Optional<Loan> findByBookIdAndReturnedFalse(Long bookId);
 
     boolean existsByBookIdAndReturnedFalse(Long bookId);
+
+    @Query("""
+                SELECT l
+                FROM Loan l
+                WHERE l.returned = false
+                  AND l.dueDate < :date
+            """)
+    List<Loan> findOverdueLoans(@Param("date") LocalDate date);
 }
