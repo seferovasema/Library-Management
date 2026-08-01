@@ -9,7 +9,6 @@ import com.sema.librarymanagment.exception.ResourceNotFoundException;
 import com.sema.librarymanagment.mapper.BookMapper;
 import com.sema.librarymanagment.repository.AuthorRepository;
 import com.sema.librarymanagment.repository.BookRepository;
-import com.sema.librarymanagment.repository.MemberRepository;
 import com.sema.librarymanagment.service.BookService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

@@ -11,4 +11,6 @@ public interface LoanService {
     List<LoanResponseDto> getOverdueLoans();
 
     List<LoanResponseDto> getActiveLoansByMember(Long memberId);
+
+    List<LoanResponseDto> searchLoansByBookTitle(String title);
 }
