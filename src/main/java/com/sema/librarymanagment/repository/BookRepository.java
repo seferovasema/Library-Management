@@ -12,10 +12,10 @@ import java.util.List;
 
 @Repository
 public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificationExecutor<Book> {
-    @EntityGraph(attributePaths = {"author"})
-    Page<Book> findAll(Pageable pageable);
 
     List<Book> findByAuthorId(Long authorId);
 
+    @EntityGraph(attributePaths = {"author", "categories"})
+    Page<Book> findAll(Pageable pageable);
 
 }
