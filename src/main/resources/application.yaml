@@ -23,3 +23,7 @@ admin:
   default-username: ${ADMIN_USERNAME}
   default-email: ${ADMIN_EMAIL}
   default-password: ${ADMIN_PASSWORD}
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE
