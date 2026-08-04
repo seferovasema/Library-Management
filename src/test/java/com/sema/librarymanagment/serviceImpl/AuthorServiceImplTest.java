@@ -18,6 +18,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,7 +53,7 @@ class AuthorServiceImplTest {
         AuthorResponseDto response = new AuthorResponseDto(1L,
                 "Sema",
                 "sema@gmail.com",
-                null);
+                Collections.emptyList());
 
         when(authorMapper.toEntity(request)).thenReturn(author);
         when(authorRepository.save(author)).thenReturn(author);
@@ -77,7 +78,7 @@ class AuthorServiceImplTest {
         AuthorResponseDto response = new AuthorResponseDto(1L,
                 "Sema",
                 "sema@gmail.com",
-                null);
+                Collections.emptyList());
 
         when(authorRepository.findById(id)).thenReturn(Optional.of(author));
         when(authorMapper.toDto(author)).thenReturn(response);
@@ -115,9 +116,10 @@ class AuthorServiceImplTest {
         AuthorResponseDto response = new AuthorResponseDto(1L,
                 "Leyla",
                 "leyla@gmail.com",
-                null);
+                Collections.emptyList());
 
         when(authorRepository.findById(id)).thenReturn(Optional.of(author));
+        when(authorRepository.save(author)).thenReturn(author);
         when(authorMapper.toDto(author)).thenReturn(response);
 
         AuthorResponseDto result = authorService.update(id, request);
@@ -129,6 +131,7 @@ class AuthorServiceImplTest {
         assertEquals("leyla@gmail.com", result.getEmail());
 
         verify(authorRepository).findById(id);
+        verify(authorRepository).save(author);
         verify(authorMapper).toDto(author);
     }
 
@@ -145,6 +148,7 @@ class AuthorServiceImplTest {
                 () -> authorService.update(id, request));
 
         verify(authorRepository).findById(id);
+        verify(authorRepository, never()).save(any());
         verifyNoInteractions(authorMapper);
     }
 
@@ -183,7 +187,7 @@ class AuthorServiceImplTest {
         AuthorResponseDto response = new AuthorResponseDto(1L,
                 "Leyla",
                 "leyla@gmail.com",
-                null);
+                Collections.emptyList());
         Page<Author> authorPage = new PageImpl<>(List.of(author));
 
         when(authorRepository.findAll(pageable)).thenReturn(authorPage);
