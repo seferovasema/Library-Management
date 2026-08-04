@@ -138,15 +138,15 @@ class LoanServiceImplRollbackTest {
 
     private Author newAuthor() {
         Author author = new Author();
-        author.setName("Robert Martin");
-        author.setEmail("robert" + System.nanoTime() + "@example.com");
+        author.setName("Sema Seferova");
+        author.setEmail("semaseferova" + System.nanoTime() + "@example.com");
         return author;
     }
 
     private Member newMember() {
         Member member = new Member();
-        member.setFullName("Test Member");
-        member.setEmail("member" + System.nanoTime() + "@example.com");
+        member.setFullName("Sema Seferova");
+        member.setEmail("semaseferova" + System.nanoTime() + "@example.com");
         member.setPhone("050" + String.format("%07d", System.nanoTime() % 10_000_000));
         member.setBorrowedBooksCount(0);
         return member;
