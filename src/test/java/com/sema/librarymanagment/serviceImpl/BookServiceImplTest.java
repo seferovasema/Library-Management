@@ -5,12 +5,12 @@ import com.sema.librarymanagment.dto.response.BookResponseDto;
 import com.sema.librarymanagment.dto.response.PageResponseDto;
 import com.sema.librarymanagment.entity.Author;
 import com.sema.librarymanagment.entity.Book;
-import com.sema.librarymanagment.entity.Member;
+import com.sema.librarymanagment.entity.Category;
 import com.sema.librarymanagment.exception.ResourceNotFoundException;
 import com.sema.librarymanagment.mapper.BookMapper;
 import com.sema.librarymanagment.repository.AuthorRepository;
 import com.sema.librarymanagment.repository.BookRepository;
-import com.sema.librarymanagment.repository.MemberRepository;
+import com.sema.librarymanagment.repository.CategoryRepository;
 import com.sema.librarymanagment.service.impl.BookServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,12 +21,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
@@ -44,7 +47,7 @@ class BookServiceImplTest {
     private AuthorRepository authorRepository;
 
     @Mock
-    private MemberRepository memberRepository;
+    private CategoryRepository categoryRepository;
 
     @Mock
     private BookMapper bookMapper;
@@ -54,113 +57,59 @@ class BookServiceImplTest {
 
     @Test
     void create_ShouldReturnBookResponseDto() {
-        BookRequestDto request = new BookRequestDto(
-                "Clean Code",
-                BigDecimal.valueOf(50),
-                1L,
-                1L);
-        Author author = new Author(1L,
-                "Robert Martin",
-                "martin@gmail.com");
-        Member member = new Member(1L,
-                "Leyla",
-                "leyla@gmail.com",
-                "0500000000");
-
+        BookRequestDto request = new BookRequestDto("Clean Code", BigDecimal.valueOf(50), 1L, List.of(1L));
+        Author author = new Author();
+        Category category = new Category();
         Book book = new Book();
-        book.setTitle("Clean Code");
-        book.setPrice(BigDecimal.valueOf(50));
+        Book savedBook = new Book();
+        BookResponseDto response = new BookResponseDto(1L, "Clean Code", BigDecimal.valueOf(50), "Robert Martin", List.of("Programming"));
 
-        BookResponseDto response = new BookResponseDto(
-                1L,
-                "Clean Code",
-                BigDecimal.valueOf(50),
-                "Robert Martin",
-                "Leyla");
-
-        when(authorRepository.findById(1L)).thenReturn(Optional.of(author));
-        when(memberRepository.findById(1L)).thenReturn(Optional.of(member));
         when(bookMapper.toEntity(request)).thenReturn(book);
-        when(bookRepository.save(book)).thenReturn(book);
-        when(bookMapper.toDto(book)).thenReturn(response);
+        when(authorRepository.findById(1L)).thenReturn(Optional.of(author));
+        when(categoryRepository.findAllById(List.of(1L))).thenReturn(List.of(category));
+        when(bookRepository.save(book)).thenReturn(savedBook);
+        when(bookMapper.toDto(savedBook)).thenReturn(response);
 
         BookResponseDto result = bookService.create(request);
 
+        assertNotNull(result);
         assertEquals("Clean Code", result.getTitle());
         assertEquals(BigDecimal.valueOf(50), result.getPrice());
 
+        verify(bookMapper).toEntity(request);
+        verify(authorRepository).findById(1L);
+        verify(categoryRepository).findAllById(List.of(1L));
         verify(bookRepository).save(book);
-        verify(bookMapper).toDto(book);
+        verify(bookMapper).toDto(savedBook);
     }
 
     @Test
     void create_ShouldThrowException_WhenAuthorNotFound() {
+        BookRequestDto request = new BookRequestDto("Clean Code", BigDecimal.valueOf(50), 1L, List.of(1L));
+        Book book = new Book();
 
-        BookRequestDto request = new BookRequestDto(
-                "Clean Code",
-                BigDecimal.valueOf(50),
-                1L,
-                1L
-        );
+        when(bookMapper.toEntity(request)).thenReturn(book);
+        when(authorRepository.findById(1L)).thenReturn(Optional.empty());
 
+        assertThrows(ResourceNotFoundException.class, () -> bookService.create(request));
 
-        when(authorRepository.findById(1L))
-                .thenReturn(Optional.empty());
-
-
-        assertThrows(ResourceNotFoundException.class,
-                () -> bookService.create(request));
-
-
-        verify(authorRepository)
-                .findById(1L);
-
-
-        verify(memberRepository, never())
-                .findById(any());
-
-
-        verify(bookRepository, never())
-                .save(any());
-    }
-
-    @Test
-    void create_ShouldThrowException_WhenMemberNotFound() {
-        BookRequestDto request = new BookRequestDto("Clean Code",
-                BigDecimal.valueOf(50),
-                1L,
-                1L);
-        Author author = new Author(1L,
-                "Robert Martin",
-                "martin@gmail.com");
-
-        when(authorRepository.findById(1L)).thenReturn(Optional.of(author));
-        when(memberRepository.findById(1L)).thenReturn(Optional.empty());
-
-        assertThrows(ResourceNotFoundException.class,
-                () -> bookService.create(request));
-
-        verify(memberRepository).findById(1L);
-        verifyNoInteractions(bookRepository);
+        verify(authorRepository).findById(1L);
+        verify(categoryRepository, never()).findAllById(any());
+        verify(bookRepository, never()).save(any());
     }
 
     @Test
     void findById_ShouldReturnBookResponseDto() {
         Long id = 1L;
         Book book = new Book();
-        book.setId(id);
-        book.setTitle("Clean Code");
-
-        BookResponseDto response = new BookResponseDto(
-                1L, "Clean Code", BigDecimal.valueOf(50),
-                "Robert Martin",
-                "Leyla");
+        BookResponseDto response = new BookResponseDto(id, "Clean Code", BigDecimal.valueOf(50), "Robert Martin", List.of("Programming"));
 
         when(bookRepository.findById(id)).thenReturn(Optional.of(book));
         when(bookMapper.toDto(book)).thenReturn(response);
 
         BookResponseDto result = bookService.findById(id);
 
+        assertNotNull(result);
         assertEquals("Clean Code", result.getTitle());
 
         verify(bookRepository).findById(id);
@@ -173,81 +122,82 @@ class BookServiceImplTest {
 
         when(bookRepository.findById(id)).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class,
-                () -> bookService.findById(id));
+        assertThrows(ResourceNotFoundException.class, () -> bookService.findById(id));
 
         verify(bookRepository).findById(id);
         verifyNoInteractions(bookMapper);
     }
 
     @Test
-    void update_ShouldReturnUpdatedBook() {
-        Long id = 1L;
-        BookRequestDto request = new BookRequestDto("Clean Architecture",
-                BigDecimal.valueOf(70),
-                1L,
-                1L);
+    void getBooksByAuthor_ShouldReturnListOfBookResponseDto() {
+        Long authorId = 1L;
         Book book = new Book();
-        Author author = new Author(1L,
-                "Robert Martin",
-                "martin@gmail.com");
-        Member member = new Member(1L,
-                "Leyla",
-                "leyla@gmail.com",
-                "0500000000");
+        BookResponseDto response = new BookResponseDto(1L, "Clean Code", BigDecimal.valueOf(50), "Robert Martin", List.of("Programming"));
 
-        BookResponseDto response = new BookResponseDto(
-                1L,
-                "Clean Architecture",
-                BigDecimal.valueOf(70),
-                "Robert Martin",
-                "Leyla");
+        when(bookRepository.findByAuthorId(authorId)).thenReturn(List.of(book));
+        when(bookMapper.toDto(book)).thenReturn(response);
+
+        List<BookResponseDto> result = bookService.getBooksByAuthor(authorId);
+
+        assertEquals(1, result.size());
+        assertEquals("Clean Code", result.get(0).getTitle());
+
+        verify(bookRepository).findByAuthorId(authorId);
+        verify(bookMapper).toDto(book);
+    }
+
+    @Test
+    void update_ShouldReturnUpdatedBookResponseDto() {
+        Long id = 1L;
+        BookRequestDto request = new BookRequestDto("Clean Architecture", BigDecimal.valueOf(70), 1L, List.of(1L));
+        Book book = new Book();
+        Author author = new Author();
+        Category category = new Category();
+        Book updatedBook = new Book();
+        BookResponseDto response = new BookResponseDto(id, "Clean Architecture", BigDecimal.valueOf(70), "Robert Martin", List.of("Programming"));
 
         when(bookRepository.findById(id)).thenReturn(Optional.of(book));
         when(authorRepository.findById(1L)).thenReturn(Optional.of(author));
-        when(memberRepository.findById(1L)).thenReturn(Optional.of(member));
-        when(bookRepository.save(book)).thenReturn(book);
-        when(bookMapper.toDto(book)).thenReturn(response);
+        when(categoryRepository.findAllById(List.of(1L))).thenReturn(List.of(category));
+        when(bookRepository.save(book)).thenReturn(updatedBook);
+        when(bookMapper.toDto(updatedBook)).thenReturn(response);
 
         BookResponseDto result = bookService.update(id, request);
 
-        assertEquals("Clean Architecture", book.getTitle());
-        assertEquals(BigDecimal.valueOf(70), book.getPrice());
+        assertNotNull(result);
         assertEquals("Clean Architecture", result.getTitle());
 
+        verify(bookRepository).findById(id);
+        verify(authorRepository).findById(1L);
+        verify(categoryRepository).findAllById(List.of(1L));
         verify(bookRepository).save(book);
-        verify(bookMapper).toDto(book);
+        verify(bookMapper).toDto(updatedBook);
     }
 
     @Test
     void update_ShouldThrowException_WhenBookNotFound() {
         Long id = 99L;
-        BookRequestDto request = new BookRequestDto(
-                "Clean Architecture",
-                BigDecimal.valueOf(70),
-                1L,
-                1L);
+        BookRequestDto request = new BookRequestDto("Clean Architecture", BigDecimal.valueOf(70), 1L, List.of(1L));
 
         when(bookRepository.findById(id)).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class,
-                () -> bookService.update(id, request));
+        assertThrows(ResourceNotFoundException.class, () -> bookService.update(id, request));
 
-        verifyNoInteractions(authorRepository, memberRepository, bookMapper);
+        verify(bookRepository).findById(id);
+        verifyNoInteractions(authorRepository, categoryRepository, bookMapper);
     }
 
     @Test
     void delete_ShouldDeleteBook() {
         Long id = 1L;
         Book book = new Book();
-        book.setId(id);
 
         when(bookRepository.findById(id)).thenReturn(Optional.of(book));
 
         bookService.delete(id);
 
         verify(bookRepository).findById(id);
-        verify(bookRepository).delete(book);
+        verify(bookRepository).delete((Book) book);
     }
 
     @Test
@@ -256,25 +206,17 @@ class BookServiceImplTest {
 
         when(bookRepository.findById(id)).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class,
-                () -> bookService.delete(id));
+        assertThrows(ResourceNotFoundException.class, () -> bookService.delete(id));
 
-        verify(bookRepository, never()).delete(any());
+        verify(bookRepository).findById(id);
+        verify(bookRepository, never()).delete(any(Book.class));
     }
 
     @Test
     void getAll_ShouldReturnPageResponseDto() {
         Pageable pageable = PageRequest.of(0, 10);
         Book book = new Book();
-        book.setTitle("Clean Code");
-
-        BookResponseDto response = new BookResponseDto(
-                1L,
-                "Clean Code",
-                BigDecimal.valueOf(50),
-                "Robert Martin",
-                "Leyla");
-
+        BookResponseDto response = new BookResponseDto(1L, "Clean Code", BigDecimal.valueOf(50), "Robert Martin", List.of("Programming"));
         Page<Book> page = new PageImpl<>(List.of(book));
 
         when(bookRepository.findAll(pageable)).thenReturn(page);
@@ -282,10 +224,30 @@ class BookServiceImplTest {
 
         PageResponseDto<BookResponseDto> result = bookService.getAll(pageable);
 
+        assertNotNull(result);
         assertEquals(1, result.getContent().size());
         assertEquals("Clean Code", result.getContent().get(0).getTitle());
 
         verify(bookRepository).findAll(pageable);
+        verify(bookMapper).toDto(book);
+    }
+
+    @Test
+    void searchBooks_ShouldReturnPageResponseDto() {
+        Pageable pageable = PageRequest.of(0, 10);
+        Book book = new Book();
+        BookResponseDto response = new BookResponseDto(1L, "Clean Code", BigDecimal.valueOf(50), "Robert Martin", List.of("Programming"));
+        Page<Book> page = new PageImpl<>(List.of(book));
+
+        when(bookRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(page);
+        when(bookMapper.toDto(book)).thenReturn(response);
+
+        PageResponseDto<BookResponseDto> result = bookService.searchBooks("Clean", "Martin", "Programming", pageable);
+
+        assertNotNull(result);
+        assertEquals(1, result.getContent().size());
+
+        verify(bookRepository).findAll(any(Specification.class), any(Pageable.class));
         verify(bookMapper).toDto(book);
     }
 }

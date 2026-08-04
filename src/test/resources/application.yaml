@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: library-management
+
+  datasource:
+    url: jdbc:h2:mem:librarytestdb;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+
+jwt:
+  secret: test-only-secret-key-please-do-not-use-in-production-1234567890
+  expiration: 86400000
+
+admin:
+  default-username: admin
+  default-email: admin@library.com
+  default-password: TestAdmin123!

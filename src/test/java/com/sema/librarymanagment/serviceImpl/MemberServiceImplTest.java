@@ -48,7 +48,8 @@ class MemberServiceImplTest {
                 "sema@gmail.com",
                 "+994501234567");
 
-        Member member = new Member(1L,
+        Member member = new Member(
+                1L,
                 "Sema Seferova",
                 "sema@gmail.com",
                 "+994501234567");
@@ -57,8 +58,7 @@ class MemberServiceImplTest {
                 1L,
                 "Sema Seferova",
                 "sema@gmail.com",
-                "+994501234567",
-                null);
+                "+994501234567"); // 4 parametr
 
         when(memberMapper.toEntity(request)).thenReturn(member);
         when(memberRepository.save(member)).thenReturn(member);
@@ -75,17 +75,17 @@ class MemberServiceImplTest {
     @Test
     void findById_ShouldReturnMemberResponseDto() {
         Long id = 1L;
-        Member member = new Member
-                (1L,
-                        "Sema Seferova",
-                        "sema@gmail.com",
-                        "+994501234567");
+        Member member = new Member(
+                1L,
+                "Sema Seferova",
+                "sema@gmail.com",
+                "+994501234567");
+
         MemberResponseDto response = new MemberResponseDto(
                 1L,
                 "Sema Seferova",
                 "sema@gmail.com",
-                "+994501234567",
-                null);
+                "+994501234567");
 
         when(memberRepository.findById(id)).thenReturn(Optional.of(member));
         when(memberMapper.toDto(member)).thenReturn(response);
@@ -119,7 +119,8 @@ class MemberServiceImplTest {
                 "leyla@gmail.com",
                 "+994501111111");
 
-        Member member = new Member(1L,
+        Member member = new Member(
+                1L,
                 "Old Name",
                 "old@gmail.com",
                 "+994500000000");
@@ -128,8 +129,7 @@ class MemberServiceImplTest {
                 1L,
                 "Leyla Veliyeva",
                 "leyla@gmail.com",
-                "+994501111111",
-                null);
+                "+994501111111");
 
         when(memberRepository.findById(id)).thenReturn(Optional.of(member));
         when(memberRepository.save(member)).thenReturn(member);
@@ -137,11 +137,9 @@ class MemberServiceImplTest {
 
         MemberResponseDto result = memberService.update(id, request);
 
-
         assertEquals("Leyla Veliyeva", member.getFullName());
         assertEquals("leyla@gmail.com", member.getEmail());
         assertEquals("+994501111111", member.getPhone());
-
         assertEquals("Leyla Veliyeva", result.getFullName());
 
         verify(memberRepository).save(member);
@@ -192,17 +190,17 @@ class MemberServiceImplTest {
     @Test
     void getAll_ShouldReturnPageResponseDto() {
         Pageable pageable = PageRequest.of(0, 10);
-        Member member =
-                new Member(1L,
-                        "Sema Seferova",
-                        "sema@gmail.com",
-                        "+994501234567");
+        Member member = new Member(
+                1L,
+                "Sema Seferova",
+                "sema@gmail.com",
+                "+994501234567");
+
         MemberResponseDto response = new MemberResponseDto(
                 1L,
                 "Sema Seferova",
                 "sema@gmail.com",
-                "+994501234567",
-                null);
+                "+994501234567");
 
         Page<Member> page = new PageImpl<>(List.of(member));
 
