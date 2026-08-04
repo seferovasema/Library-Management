@@ -1,51 +1,78 @@
 # 📚 Library Management System
 
-A RESTful Library Management System built with **Spring Boot** that allows managing books, authors, members, and users. The project follows a layered architecture and includes authentication and authorization using **Spring Security** and **JWT**.
-
-## 🚀 Features
-
-* User Registration & Login
-* User Authentication & Authorization
-* JWT Authentication
-* Role-Based Authorization (ADMIN, USER)
-* BCrypt Password Encryption
-* CRUD operations for Books
-* CRUD operations for Authors
-* CRUD operations for Members
-* DTO Pattern
-* MapStruct Mapping
-* Bean Validation
-* Request Validation
-* Global Exception Handling
-* Custom Authentication Entry Point
-* Custom Access Denied Handler
-* Pagination & Sorting
-* Swagger/OpenAPI Documentation
-* PostgreSQL Database
-* Layered Architecture (Controller → Service → Repository)
+A RESTful Library Management System built with **Spring Boot** that allows managing books, authors, categories, members, loans, and users. The project follows a layered architecture and implements authentication and authorization using **Spring Security** and **JWT**.
 
 ---
 
-## 🛠 Technologies
+## 🚀 Features
 
-* Java 21
-* Spring Boot
-* Spring Security
-* JWT (JSON Web Token)
-* Spring Data JPA
-* PostgreSQL
-* Hibernate
-* Lombok
-* MapStruct
-* Bean Validation
-* Swagger/OpenAPI
-* Gradle
+### Authentication & Authorization
+- User Registration
+- User Login
+- JWT Authentication
+- Role-Based Authorization (ADMIN, USER)
+- BCrypt Password Encryption
+
+### Book Management
+- Create Book
+- Update Book
+- Delete Book
+- Get All Books (Pagination & Sorting)
+- Get Book By ID
+- Search Books
+- Assign Author
+- Assign Categories
+
+### Author Management
+- CRUD Operations
+- View Author's Books
+
+### Category Management
+- CRUD Operations
+- Many-to-Many Relationship with Books
+
+### Member Management
+- CRUD Operations
+- View Borrowed Books
+
+### Loan Management
+- Borrow Book
+- Return Book
+- Prevent Borrowing Already Borrowed Books
+- Get Active Loans
+- Get Overdue Loans
+
+### Additional Features
+- DTO Pattern
+- Global Exception Handling
+- Validation
+- Swagger/OpenAPI Documentation
+- MapStruct Mapping
+- EntityGraph Optimization
+- Pagination & Sorting
+- PostgreSQL Database
+
+---
+
+## 🛠️ Technologies
+
+- Java 17
+- Spring Boot 3
+- Spring Web
+- Spring Data JPA
+- Spring Security
+- JWT (JSON Web Token)
+- PostgreSQL
+- MapStruct
+- Lombok
+- Gradle
+- Swagger / OpenAPI
 
 ---
 
 ## 📂 Project Structure
 
-```text
+```
 src
 ├── config
 ├── controller
@@ -53,127 +80,218 @@ src
 │   ├── request
 │   └── response
 ├── entity
-├── enums
 ├── exception
 ├── mapper
 ├── repository
 ├── security
 ├── service
-│   └── impl
-└── resources
+│   ├── impl
+│   └── interfaces
+└── util
 ```
 
 ---
 
-## 🔐 Authentication
+## 🗄️ Database Schema
 
-The application uses JWT-based authentication.
+### Entities
 
-### Public Endpoints
+- User
+- Author
+- Book
+- Category
+- Member
+- Loan
 
-```http
-POST /auth/register
-POST /auth/login
-```
+### Relationships
 
-After a successful login, the application returns a JWT token.
-
-Protected endpoints require a valid JWT token in the `Authorization` header:
-
-```http
-Authorization: Bearer <your_jwt_token>
-```
-
----
-
-## 📖 API Endpoints
-
-### Authentication
-
-```http
-POST /auth/register
-POST /auth/login
-```
-
-### Authors
-
-```http
-GET    /authors
-GET    /authors/{id}
-POST   /authors
-PUT    /authors/{id}
-DELETE /authors/{id}
-```
-
-### Books
-
-```http
-GET    /books
-GET    /books/{id}
-POST   /books
-PUT    /books/{id}
-DELETE /books/{id}
-```
-
-### Members
-
-```http
-GET    /members
-GET    /members/{id}
-POST   /members
-PUT    /members/{id}
-DELETE /members/{id}
-```
+- Author → OneToMany → Book
+- Book → ManyToOne → Author
+- Book → ManyToMany → Category
+- Member → OneToMany → Loan
+- Book → OneToMany → Loan
 
 ---
 
-## 📑 API Documentation
+## 🔐 Security
 
-Swagger UI is available after starting the application:
+Authentication is implemented using **JWT**.
 
-```text
+Roles:
+
+- **ADMIN**
+    - Full CRUD access
+    - Manage users
+    - Manage books
+    - Manage authors
+    - Manage categories
+    - Manage members
+    - Manage loans
+
+- **USER**
+    - View resources
+    - Borrow books
+    - Return books
+
+---
+
+## 📖 API Documentation
+
+Swagger UI:
+
+```
 http://localhost:8080/swagger-ui/index.html
 ```
 
----
+OpenAPI:
 
-## 🗄 Database
-
-**Database:** PostgreSQL
-
-The application uses Spring Data JPA and Hibernate for database operations.
+```
+http://localhost:8080/v3/api-docs
+```
 
 ---
 
-## ▶ Running the Project
+## ⚙️ Configuration
 
-Clone the repository:
+Create an `.env` or configure environment variables:
+
+```properties
+DB_USERNAME=postgres
+DB_PASSWORD=your_password
+
+JWT_SECRET=your_secret_key
+```
+
+application.yml
+
+```yaml
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/library_db
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: 86400000
+```
+
+---
+
+## ▶️ Running the Project
+
+### Clone Repository
 
 ```bash
 git clone https://github.com/seferovasema/Library-Management.git
 ```
 
-Go to the project directory:
+### Enter Project
 
 ```bash
 cd Library-Management
 ```
 
-Run the application:
+### Run
 
-**Linux / macOS**
+Windows
+
+```bash
+gradlew bootRun
+```
+
+Linux / Mac
 
 ```bash
 ./gradlew bootRun
 ```
 
-**Windows**
+---
 
-```bash
-gradlew.bat bootRun
+## 📌 Example Endpoints
+
+### Authentication
+
+```
+POST /auth/register
+POST /auth/login
 ```
 
-You can also run the project directly from IntelliJ IDEA.
+### Books
+
+```
+GET /books
+GET /books/{id}
+POST /books
+PUT /books/{id}
+DELETE /books/{id}
+```
+
+### Authors
+
+```
+GET /authors
+POST /authors
+PUT /authors/{id}
+DELETE /authors/{id}
+```
+
+### Categories
+
+```
+GET /categories
+POST /categories
+PUT /categories/{id}
+DELETE /categories/{id}
+```
+
+### Members
+
+```
+GET /members
+POST /members
+PUT /members/{id}
+DELETE /members/{id}
+```
+
+### Loans
+
+```
+POST /loans/borrow
+POST /loans/return
+GET /loans
+GET /loans/overdue
+```
+
+---
+
+## 🧪 Validation
+
+The project uses:
+
+- Jakarta Validation
+- Global Exception Handler
+- Custom Exceptions
+
+Examples:
+
+- ResourceNotFoundException
+- UserAlreadyExistsException
+- EmailAlreadyExistsException
+
+---
+
+## 📷 Screenshots
+
+You can add screenshots here.
+
+Example:
+
+```
+images/
+    swagger.png
+    database.png
+```
 
 ---
 
@@ -181,4 +299,25 @@ You can also run the project directly from IntelliJ IDEA.
 
 **Sema Seferova**
 
-GitHub Repository: https://github.com/seferovasema/Library-Management
+Java Backend Developer
+
+GitHub:
+https://github.com/seferovasema
+
+---
+
+## ⭐ Future Improvements
+
+- Docker Support
+- Unit Tests (JUnit & Mockito)
+- Integration Tests
+- Redis Cache
+- Email Notifications
+- Audit Logging
+- CI/CD Pipeline
+
+---
+
+## 📄 License
+
+This project is for educational purposes.
