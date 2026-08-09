@@ -1,41 +1,43 @@
-spring:
-  application:
-    name: library-management
 
-  datasource:
-    url: jdbc:postgresql://localhost:5432/library_db
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+  spring:
+    application:
+      name: library-management
 
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    properties:
+    datasource:
+      url: jdbc:postgresql://localhost:5432/library_db
+      username: ${DB_USERNAME}
+      password: ${DB_PASSWORD}
+
+    jpa:
       hibernate:
-        format_sql: true
+        ddl-auto: update
+      show-sql: true
+      properties:
+        hibernate:
+          format_sql: true
 
-jwt:
-  secret: ${JWT_SECRET}
-  expiration: 86400000
+  jwt:
+    secret: ${JWT_SECRET}
+    expiration: 86400000
 
-admin:
-  default-username: ${ADMIN_USERNAME}
-  default-email: ${ADMIN_EMAIL}
-  default-password: ${ADMIN_PASSWORD}
+  admin:
+    default-username: ${ADMIN_USERNAME}
+    default-email: ${ADMIN_EMAIL}
+    default-password: ${ADMIN_PASSWORD}
 
-cache:
-  book:
-    ttl-minutes: 10
-    max-size: 500
+  cache:
+    book:
+      ttl-minutes: 10
+      max-size: 500
 
-file:
-  upload:
-    dir: ${FILE_UPLOAD_DIR:uploads}
-    allowed-extensions: ${FILE_ALLOWED_EXTENSIONS:jpg,jpeg,png,webp}
-    max-size-bytes: ${FILE_MAX_SIZE_BYTES:5242880}
+  file:
+    upload:
+      dir: ${FILE_UPLOAD_DIR:uploads}
+      allowed-extensions: ${FILE_ALLOWED_EXTENSIONS:jpg,jpeg,png,webp}
+      max-size-bytes: ${FILE_MAX_SIZE_BYTES:5242880}
 
-logging:
-  level:
-    org.hibernate.SQL: DEBUG
-    org.hibernate.orm.jdbc.bind: TRACE
+  logging:
+    level:
+      org.hibernate.SQL: DEBUG
+      org.hibernate.orm.jdbc.bind: TRACE
+
