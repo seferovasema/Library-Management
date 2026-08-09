@@ -1,3 +1,4 @@
+
 package com.sema.librarymanagment.service.impl;
 
 import com.sema.librarymanagment.dto.request.LoanRequestDto;
@@ -11,6 +12,7 @@ import com.sema.librarymanagment.repository.BookRepository;
 import com.sema.librarymanagment.repository.LoanRepository;
 import com.sema.librarymanagment.repository.MemberRepository;
 import com.sema.librarymanagment.service.LoanService;
+import com.sema.librarymanagment.service.notification.NotificationService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,10 +28,12 @@ public class LoanServiceImpl implements LoanService {
     private final LoanMapper loanMapper;
     private final BookRepository bookRepository;
     private final MemberRepository memberRepository;
+    private final NotificationService notificationService;
 
     @Override
     public List<LoanResponseDto> getActiveLoans() {
         List<Loan> loans = loanRepository.findByReturnedFalse();
+
         return loans.stream()
                 .map(loanMapper::toDto)
                 .toList();
@@ -46,7 +50,8 @@ public class LoanServiceImpl implements LoanService {
 
     @Override
     public List<LoanResponseDto> getActiveLoansByMember(Long memberId) {
-        List<Loan> loans = loanRepository.findByMemberIdAndReturnedFalse(memberId);
+        List<Loan> loans =
+                loanRepository.findByMemberIdAndReturnedFalse(memberId);
 
         return loans.stream()
                 .map(loanMapper::toDto)
@@ -55,7 +60,8 @@ public class LoanServiceImpl implements LoanService {
 
     @Override
     public List<LoanResponseDto> searchLoansByBookTitle(String title) {
-        List<Loan> loans = loanRepository.findByBookTitleContainingIgnoreCase(title);
+        List<Loan> loans =
+                loanRepository.findByBookTitleContainingIgnoreCase(title);
 
         return loans.stream()
                 .map(loanMapper::toDto)
@@ -65,6 +71,7 @@ public class LoanServiceImpl implements LoanService {
     @Override
     @Transactional
     public LoanResponseDto borrowBook(LoanRequestDto dto) {
+
         if (loanRepository.existsByBookIdAndReturnedFalse(dto.getBookId())) {
             throw new IllegalStateException("Book is already borrowed");
         }
@@ -85,11 +92,18 @@ public class LoanServiceImpl implements LoanService {
         loan.setDueDate(dto.getDueDate());
         loan.setReturned(false);
 
-        member.setBorrowedBooksCount(member.getBorrowedBooksCount() + 1);
+        member.setBorrowedBooksCount(
+                member.getBorrowedBooksCount() + 1
+        );
 
         memberRepository.save(member);
 
         Loan savedLoan = loanRepository.save(loan);
+
+        notificationService.sendLoanNotification(
+                "Book borrowed successfully. Loan ID: "
+                        + savedLoan.getId()
+        );
 
         return loanMapper.toDto(savedLoan);
     }
@@ -110,13 +124,21 @@ public class LoanServiceImpl implements LoanService {
         loan.setReturnDate(LocalDate.now());
 
         Member member = loan.getMember();
+
         member.setBorrowedBooksCount(
                 Math.max(0, member.getBorrowedBooksCount() - 1)
         );
+
         memberRepository.save(member);
 
         Loan updatedLoan = loanRepository.save(loan);
 
+        notificationService.sendLoanNotification(
+                "Book returned successfully. Loan ID: "
+                        + updatedLoan.getId()
+        );
+
         return loanMapper.toDto(updatedLoan);
     }
 }
+
