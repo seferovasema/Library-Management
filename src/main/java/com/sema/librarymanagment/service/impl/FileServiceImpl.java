@@ -17,14 +17,13 @@ import java.util.UUID;
 
 @Service
 public class FileServiceImpl implements FileService {
-
-    @Value("${file.upload.dir}")
+    @Value("${file.upload.dir:uploads}")
     private String uploadDir;
 
-    @Value("${file.upload.max-size-bytes}")
+    @Value("${file.upload.max-size-bytes:5242880}")
     private long maxFileSize;
 
-    @Value("${file.upload.allowed-extensions}")
+    @Value("${file.upload.allowed-extensions:jpg,jpeg,png,webp}")
     private String allowedExtensions;
 
     @Override
