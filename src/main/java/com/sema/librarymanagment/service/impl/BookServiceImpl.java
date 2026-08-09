@@ -1,5 +1,6 @@
 package com.sema.librarymanagment.service.impl;
 
+import com.sema.librarymanagment.config.CacheConfig;
 import com.sema.librarymanagment.dto.request.BookRequestDto;
 import com.sema.librarymanagment.dto.response.BookResponseDto;
 import com.sema.librarymanagment.dto.response.PageResponseDto;
@@ -13,6 +14,7 @@ import com.sema.librarymanagment.repository.BookRepository;
 import com.sema.librarymanagment.repository.CategoryRepository;
 import com.sema.librarymanagment.service.BookService;
 import com.sema.librarymanagment.specification.BookSpecification;
+import org.springframework.cache.annotation.Cacheable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -47,6 +49,7 @@ public class BookServiceImpl implements BookService {
         return bookMapper.toDto(bookSaved);
     }
 
+    @Cacheable(value = CacheConfig.BOOKS_CACHE)
     @Override
     public PageResponseDto<BookResponseDto> getAll(Pageable pageable) {
         Page<Book> books = bookRepository.findAll(pageable);
@@ -55,7 +58,7 @@ public class BookServiceImpl implements BookService {
 
         return PageResponseDto.of(dtoPage);
     }
-
+    @Cacheable(value = CacheConfig.BOOK_BY_ID_CACHE, key = "#id")
     @Override
     public BookResponseDto findById(Long id) {
         Book book = bookRepository.findById(id).orElseThrow(() ->
@@ -63,6 +66,11 @@ public class BookServiceImpl implements BookService {
         return bookMapper.toDto(book);
     }
 
+
+    @Cacheable(
+            value = CacheConfig.BOOKS_BY_AUTHOR_CACHE,
+            key = "#authorId"
+    )
     @Override
     public List<BookResponseDto> getBooksByAuthor(Long authorId) {
         List<Book> books = bookRepository.findByAuthorId(authorId);
