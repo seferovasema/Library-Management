@@ -14,6 +14,7 @@ import com.sema.librarymanagment.repository.BookRepository;
 import com.sema.librarymanagment.repository.CategoryRepository;
 import com.sema.librarymanagment.service.BookService;
 import com.sema.librarymanagment.specification.BookSpecification;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -31,6 +32,13 @@ public class BookServiceImpl implements BookService {
     private final AuthorRepository authorRepository;
     private final CategoryRepository categoryRepository;
 
+    @CacheEvict(
+            value = {
+                    CacheConfig.BOOKS_CACHE,
+                    CacheConfig.BOOKS_BY_AUTHOR_CACHE
+            },
+            allEntries = true
+    )
     @Override
     public BookResponseDto create(BookRequestDto dto) {
         Book book = bookMapper.toEntity(dto);
@@ -81,7 +89,14 @@ public class BookServiceImpl implements BookService {
     }
 
 
-
+    @CacheEvict(
+            value = {
+                    CacheConfig.BOOKS_CACHE,
+                    CacheConfig.BOOK_BY_ID_CACHE,
+                    CacheConfig.BOOKS_BY_AUTHOR_CACHE
+            },
+            allEntries = true
+    )
     @Override
     public BookResponseDto update(Long id, BookRequestDto dto) {
         Book book = bookRepository.findById(id)
@@ -102,6 +117,14 @@ public class BookServiceImpl implements BookService {
         return bookMapper.toDto(updatedBook);
     }
 
+    @CacheEvict(
+            value = {
+                    CacheConfig.BOOKS_CACHE,
+                    CacheConfig.BOOK_BY_ID_CACHE,
+                    CacheConfig.BOOKS_BY_AUTHOR_CACHE
+            },
+            allEntries = true
+    )
     @Override
     public void delete(Long id) {
         Book book = bookRepository.findById(id)

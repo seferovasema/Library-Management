@@ -29,6 +29,12 @@ cache:
     ttl-minutes: 10
     max-size: 500
 
+file:
+  upload:
+    dir: ${FILE_UPLOAD_DIR:uploads}
+    allowed-extensions: ${FILE_ALLOWED_EXTENSIONS:jpg,jpeg,png,webp}
+    max-size-bytes: ${FILE_MAX_SIZE_BYTES:5242880}
+
 logging:
   level:
     org.hibernate.SQL: DEBUG
