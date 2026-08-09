@@ -12,6 +12,7 @@ import java.util.Optional;
 
 @Repository
 public interface LoanRepository extends JpaRepository<Loan, Long> {
+
     List<Loan> findByReturnedFalse();
 
     List<Loan> findByReturnedFalseAndDueDateBefore(LocalDate date);
@@ -24,11 +25,13 @@ public interface LoanRepository extends JpaRepository<Loan, Long> {
 
     boolean existsByBookIdAndReturnedFalse(Long bookId);
 
+    List<Loan> findByReturnedTrueAndReturnDateBefore(LocalDate date);
+
     @Query("""
-                SELECT l
-                FROM Loan l
-                WHERE l.returned = false
-                  AND l.dueDate < :date
-            """)
+            SELECT l
+            FROM Loan l
+            WHERE l.returned = false
+              AND l.dueDate < :date
+        """)
     List<Loan> findOverdueLoans(@Param("date") LocalDate date);
 }
