@@ -23,6 +23,12 @@ admin:
   default-username: ${ADMIN_USERNAME}
   default-email: ${ADMIN_EMAIL}
   default-password: ${ADMIN_PASSWORD}
+
+cache:
+  book:
+    ttl-minutes: 10
+    max-size: 500
+
 logging:
   level:
     org.hibernate.SQL: DEBUG
