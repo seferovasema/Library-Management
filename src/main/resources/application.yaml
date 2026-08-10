@@ -2,18 +2,8 @@ spring:
   application:
     name: library-management
 
-  datasource:
-    url: jdbc:postgresql://localhost:5432/library_db
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
+  profiles:
+    active: dev
 
 jwt:
   secret: ${JWT_SECRET}
@@ -34,8 +24,3 @@ file:
     dir: ${FILE_UPLOAD_DIR:uploads}
     allowed-extensions: ${FILE_ALLOWED_EXTENSIONS:jpg,jpeg,png,webp}
     max-size-bytes: ${FILE_MAX_SIZE_BYTES:5242880}
-
-logging:
-  level:
-    org.hibernate.SQL: DEBUG
-    org.hibernate.orm.jdbc.bind: TRACE
