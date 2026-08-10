@@ -2,8 +2,10 @@ package com.sema.librarymanagment.controller;
 
 import com.sema.librarymanagment.service.FileService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
@@ -24,23 +26,20 @@ import java.net.URLConnection;
         name = "File",
         description = "File upload and download operations"
 )
+@SecurityRequirement(name = "Bearer Authentication")
 public class FileController {
 
     private final FileService fileService;
 
     @Operation(
             summary = "Upload a file",
-            description = "Uploads JPG, JPEG, PNG or WEBP file. Maximum size is 5 MB."
+            description = "Uploads a JPG, JPEG, PNG or WEBP file. Maximum file size is 5 MB."
     )
     @ApiResponses({
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "File uploaded successfully"
-            ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Invalid file"
-            )
+            @ApiResponse(responseCode = "200", description = "File uploaded successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid file"),
+            @ApiResponse(responseCode = "401", description = "Authentication required"),
+            @ApiResponse(responseCode = "403", description = "Access denied")
     })
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(
@@ -48,8 +47,11 @@ public class FileController {
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
     public ResponseEntity<String> uploadFile(
-            @RequestParam("file") MultipartFile file
-    ) throws IOException {
+            @Parameter(
+                    description = "File to upload",
+                    required = true
+            )
+            @RequestParam("file") MultipartFile file) throws IOException {
 
         String fileName = fileService.uploadFile(file);
 
@@ -63,20 +65,18 @@ public class FileController {
             description = "Downloads a previously uploaded file."
     )
     @ApiResponses({
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "File downloaded successfully"
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "File not found"
-            )
+            @ApiResponse(responseCode = "200", description = "File downloaded successfully"),
+            @ApiResponse(responseCode = "404", description = "File not found"),
+            @ApiResponse(responseCode = "401", description = "Authentication required")
     })
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @GetMapping("/{fileName}")
     public ResponseEntity<ByteArrayResource> downloadFile(
-            @PathVariable String fileName
-    ) throws IOException {
+            @Parameter(
+                    description = "Name of the file to download",
+                    example = "book-cover.png"
+            )
+            @PathVariable String fileName) throws IOException {
 
         byte[] data = fileService.downloadFile(fileName);
 
