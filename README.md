@@ -42,6 +42,23 @@ A RESTful Library Management System built with **Spring Boot** that allows manag
 - Get Active Loans
 - Get Overdue Loans
 
+### Caching
+- Read-heavy Book endpoints (`findById`, `getAll`, `getBooksByAuthor`) cached with Spring Cache (Caffeine, in-memory)
+- Automatic cache invalidation on create/update/delete
+- Configurable TTL and max size (`cache.book.ttl-minutes`, `cache.book.max-size`)
+
+### File Upload & Download
+- Multipart file upload (JPG, JPEG, PNG, WEBP)
+- File size limit and extension whitelist validation
+- Real content-type verification via file signature (magic bytes) — rejects
+  spoofed files (e.g. a `.txt` renamed to `.jpg`)
+
+### Scheduled Tasks
+- Daily cleanup of loan records older than 30 days (`@Scheduled`)
+
+### Asynchronous Notifications
+- Non-blocking email notification simulation on borrow/return (`@Async`)
+
 ### Additional Features
 - DTO Pattern
 - Global Exception Handling
@@ -51,6 +68,8 @@ A RESTful Library Management System built with **Spring Boot** that allows manag
 - EntityGraph Optimization
 - Pagination & Sorting
 - PostgreSQL Database
+- Spring Cache Abstraction (Caffeine)
+- Environment-based configuration (dev / prod profiles)
 
 ---
 
@@ -61,6 +80,7 @@ A RESTful Library Management System built with **Spring Boot** that allows manag
 - Spring Web
 - Spring Data JPA
 - Spring Security
+- Spring Cache (Caffeine)
 - JWT (JSON Web Token)
 - PostgreSQL
 - MapStruct
@@ -80,14 +100,16 @@ src
 │   ├── request
 │   └── response
 ├── entity
+├── enums
 ├── exception
 ├── mapper
 ├── repository
 ├── security
 ├── service
 │   ├── impl
-│   └── interfaces
-└── util
+│   ├── notification
+│   └── scheduled
+└── specification
 ```
 
 ---
@@ -127,11 +149,13 @@ Roles:
     - Manage categories
     - Manage members
     - Manage loans
+    - Upload files
 
 - **USER**
     - View resources
     - Borrow books
     - Return books
+    - Download files
 
 ---
 
@@ -153,27 +177,62 @@ http://localhost:8080/v3/api-docs
 
 ## ⚙️ Configuration
 
-Create an `.env` or configure environment variables:
+The project uses Spring profiles (`dev` / `prod`), each with its own
+`application-{profile}.yaml`. The default active profile is `dev`
+(`spring.profiles.active`), overridable via the `SPRING_PROFILES_ACTIVE`
+environment variable.
+
+Set the following environment variables:
 
 ```properties
 DB_USERNAME=postgres
 DB_PASSWORD=your_password
 
 JWT_SECRET=your_secret_key
+
+ADMIN_USERNAME=admin
+ADMIN_EMAIL=admin@library.com
+ADMIN_PASSWORD=your_admin_password
+
+# Optional overrides
+FILE_UPLOAD_DIR=uploads
+FILE_ALLOWED_EXTENSIONS=jpg,jpeg,png,webp
+FILE_MAX_SIZE_BYTES=5242880
 ```
 
-application.yml
+| Profile | ddl-auto | show-sql | Purpose                                  |
+|---------|----------|----------|-------------------------------------------|
+| `dev`   | update   | true     | Local development                        |
+| `prod`  | validate | false    | Production (schema managed via migrations) |
+
+application.yaml (common)
 
 ```yaml
 spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/library_db
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+  application:
+    name: library-management
+  profiles:
+    active: dev
 
 jwt:
   secret: ${JWT_SECRET}
   expiration: 86400000
+
+admin:
+  default-username: ${ADMIN_USERNAME}
+  default-email: ${ADMIN_EMAIL}
+  default-password: ${ADMIN_PASSWORD}
+
+cache:
+  book:
+    ttl-minutes: 10
+    max-size: 500
+
+file:
+  upload:
+    dir: ${FILE_UPLOAD_DIR:uploads}
+    allowed-extensions: ${FILE_ALLOWED_EXTENSIONS:jpg,jpeg,png,webp}
+    max-size-bytes: ${FILE_MAX_SIZE_BYTES:5242880}
 ```
 
 ---
@@ -206,6 +265,12 @@ Linux / Mac
 ./gradlew bootRun
 ```
 
+Run with a specific profile:
+
+```bash
+./gradlew bootRun --args='--spring.profiles.active=prod'
+```
+
 ---
 
 ## 📌 Example Endpoints
@@ -220,10 +285,12 @@ POST /auth/login
 ### Books
 
 ```
-GET /books
-GET /books/{id}
-POST /books
-PUT /books/{id}
+GET    /books
+GET    /books/{id}
+GET    /books/author/{authorId}
+GET    /books/search
+POST   /books
+PUT    /books/{id}
 DELETE /books/{id}
 ```
 
@@ -259,8 +326,15 @@ DELETE /members/{id}
 ```
 POST /loans/borrow
 POST /loans/return
-GET /loans
-GET /loans/overdue
+GET  /loans
+GET  /loans/overdue
+```
+
+### Files
+
+```
+POST /files/upload
+GET  /files/{fileName}
 ```
 
 ---
@@ -309,11 +383,8 @@ https://github.com/seferovasema
 ## ⭐ Future Improvements
 
 - Docker Support
-- Unit Tests (JUnit & Mockito)
-- Integration Tests
-- Redis Cache
-- Email Notifications
-- Audit Logging
+- Controller-level (MockMvc) tests
+- Redis Cache (alternative to in-memory Caffeine)
 - CI/CD Pipeline
 
 ---
