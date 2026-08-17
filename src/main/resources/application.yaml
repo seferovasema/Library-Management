@@ -5,6 +5,9 @@ spring:
   profiles:
     active: dev
 
+  jpa:
+    open-in-view: false
+
 jwt:
   secret: ${JWT_SECRET}
   expiration: 86400000

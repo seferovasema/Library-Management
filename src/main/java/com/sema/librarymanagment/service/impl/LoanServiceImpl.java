@@ -13,7 +13,7 @@ import com.sema.librarymanagment.repository.LoanRepository;
 import com.sema.librarymanagment.repository.MemberRepository;
 import com.sema.librarymanagment.service.LoanService;
 import com.sema.librarymanagment.service.notification.NotificationService;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +31,7 @@ public class LoanServiceImpl implements LoanService {
     private final NotificationService notificationService;
 
     @Override
+    @Transactional(readOnly = true)
     public List<LoanResponseDto> getActiveLoans() {
         List<Loan> loans = loanRepository.findByReturnedFalse();
 
@@ -40,6 +41,7 @@ public class LoanServiceImpl implements LoanService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<LoanResponseDto> getOverdueLoans() {
         List<Loan> loans = loanRepository.findOverdueLoans(LocalDate.now());
 
@@ -49,6 +51,7 @@ public class LoanServiceImpl implements LoanService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<LoanResponseDto> getActiveLoansByMember(Long memberId) {
         List<Loan> loans =
                 loanRepository.findByMemberIdAndReturnedFalse(memberId);
@@ -59,6 +62,7 @@ public class LoanServiceImpl implements LoanService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<LoanResponseDto> searchLoansByBookTitle(String title) {
         List<Loan> loans =
                 loanRepository.findByBookTitleContainingIgnoreCase(title);
