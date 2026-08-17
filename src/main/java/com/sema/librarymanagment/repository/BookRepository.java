@@ -13,6 +13,7 @@ import java.util.List;
 @Repository
 public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificationExecutor<Book> {
 
+    @EntityGraph(attributePaths = {"author", "categories"})
     List<Book> findByAuthorId(Long authorId);
 
     @EntityGraph(attributePaths = {"author", "categories"})
