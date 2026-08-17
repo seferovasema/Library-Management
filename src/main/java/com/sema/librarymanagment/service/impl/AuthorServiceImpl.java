@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
@@ -30,18 +31,19 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PageResponseDto<AuthorResponseDto> getAll(Pageable pageable) {
         Page<Author> authors = authorRepository.findAll(pageable);
 
-        Page<AuthorResponseDto> dtoPage = authors.map(authorMapper::toDto);
+        Page<AuthorResponseDto> dtoPage = authors.map(authorMapper::toListDto);
 
         return PageResponseDto.of(dtoPage);
     }
 
-
     @Override
+    @Transactional(readOnly = true)
     public AuthorResponseDto findById(Long id) {
-        Author author = authorRepository.findById(id).orElseThrow(() ->
+        Author author = authorRepository.findWithBooksById(id).orElseThrow(() ->
                 new ResourceNotFoundException("Author not found"));
         return authorMapper.toDto(author);
     }
